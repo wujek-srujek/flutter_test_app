@@ -21,6 +21,7 @@ class App extends StatelessWidget {
               ),
             ),
             _createButton(),
+            RemoteCamerasSnackBarShowingElevatedButtonWhichExistsOnlyToGetABuildContext(),
           ],
         ),
       ),
@@ -35,6 +36,17 @@ Widget _createButton() {
       child: Text('Functional'),
     ),
   );
+}
+
+class RemoteCamerasSnackBarShowingElevatedButtonWhichExistsOnlyToGetABuildContext
+    extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => _showSnackBar(context, 'Widget'),
+      child: Text('Widget'),
+    );
+  }
 }
 
 void _showSnackBar(BuildContext context, String text) {
