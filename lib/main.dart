@@ -18,9 +18,11 @@ class App extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ElevatedButton(
-                onPressed: () => _showSnackBar(context, 'Inline'),
-                child: Text('Inline'),
+              Builder(
+                builder: (subContext) => ElevatedButton(
+                  onPressed: () => _showSnackBar(subContext, 'Inline'),
+                  child: Text('Inline'),
+                ),
               ),
               RemoteCamerasSnackBarShowingElevatedButtonWhichExistsOnlyToGetABuildContext(),
             ],
