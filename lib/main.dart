@@ -14,11 +14,13 @@ class App extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ElevatedButton(
-              onPressed: () => _showSnackBar(context, 'Inline'),
-              child: Text('Inline'),
+            Builder(
+              builder: (subContext) => ElevatedButton(
+                onPressed: () => _showSnackBar(subContext, 'Inline'),
+                child: Text('Inline'),
+              ),
             ),
-            _createButton(context),
+            _createButton(),
           ],
         ),
       ),
@@ -26,10 +28,12 @@ class App extends StatelessWidget {
   }
 }
 
-Widget _createButton(BuildContext context) {
-  return ElevatedButton(
-    onPressed: () => _showSnackBar(context, 'Functional'),
-    child: Text('Functional'),
+Widget _createButton() {
+  return Builder(
+    builder: (subContext) => ElevatedButton(
+      onPressed: () => _showSnackBar(subContext, 'Functional'),
+      child: Text('Functional'),
+    ),
   );
 }
 
