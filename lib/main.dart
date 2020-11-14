@@ -57,7 +57,7 @@ class _BlahState extends State<Blah> {
       Offset.zero,
     );
     final left = offset.dx;
-    final top = offset.dy + size.height;
+    final top = offset.dy + size.height / 10;
     // #endregion
 
     overlayEntry = OverlayEntry(
