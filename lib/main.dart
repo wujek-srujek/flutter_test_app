@@ -51,7 +51,7 @@ class _BlahState extends State<Blah> {
 
   void showOverlay() {
     // #region calculations
-    final size = context.size;
+    final size = Navigator.of(context).context.size;
     final offset = MatrixUtils.transformPoint(
       context.findRenderObject().getTransformTo(null),
       Offset.zero,
