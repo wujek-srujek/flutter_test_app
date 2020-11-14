@@ -54,12 +54,41 @@ class Blah extends StatefulWidget {
 class _BlahState extends State<Blah> {
   OverlayEntry overlayEntry;
   Timer autoHideTimer;
+  final overlayKey = GlobalKey<OverlayState>();
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: toggleOverlay,
-      child: Text('Toggle overlay'),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ElevatedButton(
+          onPressed: toggleOverlay,
+          child: Text('Toggle overlay'),
+        ),
+        Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+              ),
+              height: 200,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: widget.overlayColor),
+              ),
+              height: 150,
+              width: 150,
+              child: Overlay(key: overlayKey),
+            ),
+            Container(
+              color: Colors.cyan,
+              height: 50,
+              width: 50,
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -72,32 +101,17 @@ class _BlahState extends State<Blah> {
   }
 
   void showOverlay() {
-    // #region calculations
-    final size = context.size;
-    final offset = MatrixUtils.transformPoint(
-      context.findRenderObject().getTransformTo(null),
-      Offset.zero,
-    );
-    final left = offset.dx;
-    final top =
-        widget.bottom ? offset.dy + size.height : offset.dy - size.height;
-    // #endregion
-
     overlayEntry = OverlayEntry(
       builder: (context) {
         return Positioned(
-          top: top,
-          left: left,
           child: Container(
             color: widget.overlayColor,
-            width: size.width,
-            height: size.height,
           ),
         );
       },
     );
 
-    Navigator.of(context).overlay.insert(overlayEntry);
+    overlayKey.currentState.insert(overlayEntry);
 
     autoHideTimer = Timer(Duration(seconds: 3), hideOverlay);
   }
