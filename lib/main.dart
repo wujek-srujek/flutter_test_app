@@ -45,7 +45,7 @@ class _Page extends StatelessWidget {
           child: _ColorWidget(depth: depth),
         ),
         Expanded(
-          child: _NavigatorSubPage(depth: depth),
+          child: _NavigatorSubPage(),
         ),
       ],
     );
@@ -53,32 +53,39 @@ class _Page extends StatelessWidget {
 }
 
 class _NavigatorSubPage extends StatelessWidget {
-  final int depth;
-
-  const _NavigatorSubPage({@required this.depth});
-
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _NavigationControls(
-          onPreviousPressed: () {
-            final navigatorState = Navigator.of(context);
-            if (navigatorState.canPop()) {
-              navigatorState.pop();
-            }
-          },
-          onNextPressed: () {
-            Navigator.of(context).pushNamed<void>(
-              '/next',
-              arguments: depth + 1,
-            );
-          },
-        ),
-        Expanded(
-          child: _ColorWidget(depth: 0),
-        ),
-      ],
+    return Navigator(
+      onGenerateRoute: (settings) {
+        return route(settings.arguments as int ?? 0);
+      },
+    );
+  }
+
+  Route<void> route(int depth) {
+    return MaterialPageRoute<void>(
+      builder: (context) {
+        return Column(
+          children: [
+            _NavigationControls(
+              onPreviousPressed: () {
+                final navigatorState = Navigator.of(context);
+                if (navigatorState.canPop()) {
+                  navigatorState.pop();
+                }
+              },
+              onNextPressed: () {
+                Navigator.of(context).pushNamed<void>(
+                  '/next',
+                  arguments: depth + 1,
+                );
+              },
+            ),
+            Expanded(
+              child: _ColorWidget(depth: depth),
+            ),
+          ],
+        );
+      },
     );
   }
 }
