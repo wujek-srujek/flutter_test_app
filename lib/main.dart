@@ -53,18 +53,20 @@ class _Page extends StatelessWidget {
 }
 
 class _NavigatorSubPage extends StatelessWidget {
+  final navigatorKey = GlobalKey<NavigatorState>();
+
   Widget build(BuildContext context) {
     return Column(
       children: [
         _NavigationControls(
           onPreviousPressed: () {
-            final navigatorState = Navigator.of(context);
+            final navigatorState = Navigator.of(navigatorKey.currentContext);
             if (navigatorState.canPop()) {
               navigatorState.pop();
             }
           },
           onNextPressed: () {
-            Navigator.of(context).pushNamed<void>(
+            Navigator.of(navigatorKey.currentContext).pushNamed<void>(
               '/next',
               arguments: 0,
             );
@@ -72,6 +74,7 @@ class _NavigatorSubPage extends StatelessWidget {
         ),
         Expanded(
           child: Navigator(
+            key: navigatorKey,
             onGenerateRoute: (settings) {
               return route(0);
             },
