@@ -3,17 +3,19 @@ import 'package:flutter/material.dart';
 void main() {
   runApp(
     MaterialApp(
-      onGenerateRoute: (settings) {
-        return MaterialPageRoute<void>(
-          builder: (context) => Scaffold(
-            body: SafeArea(
-              child: _Page(
-                depth: settings.arguments as int ?? 0,
-              ),
-            ),
+      home: Scaffold(
+        body: SafeArea(
+          child: _Pager<void>(
+            nextRoute: (depth) {
+              return MaterialPageRoute<void>(
+                builder: (context) => _Page(
+                  depth: depth,
+                ),
+              );
+            },
           ),
-        );
-      },
+        ),
+      ),
     ),
   );
 }
@@ -27,104 +29,76 @@ class _Page extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _NavigationControls(
-          onPreviousPressed: () {
-            final navigatorState = Navigator.of(context);
-            if (navigatorState.canPop()) {
-              navigatorState.pop();
-            }
-          },
-          onNextPressed: () {
-            Navigator.of(context).pushNamed<void>(
-              '/next',
-              arguments: depth + 1,
-            );
-          },
-        ),
         Expanded(
           child: _ColorWidget(depth: depth),
-        ),
-        Expanded(
-          child: _NavigatorSubPage(),
         ),
       ],
     );
   }
 }
 
-class _NavigatorSubPage extends StatefulWidget {
+class _Pager<T> extends StatefulWidget {
+  final Route<T> Function(int) nextRoute;
+
+  _Pager({@required this.nextRoute});
+
   @override
-  _NavigatorSubPageState createState() => _NavigatorSubPageState();
+  _PagerState<T> createState() => _PagerState<T>();
 }
 
-class _NavigatorSubPageState extends State<_NavigatorSubPage> {
+class _PagerState<T> extends State<_Pager<T>> {
   final navigatorKey = GlobalKey<NavigatorState>();
+
   int depth;
 
+  @override
+  void initState() {
+    super.initState();
+    depth = 0;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _NavigationControls(
-          onPreviousPressed: () {
-            final navigatorState = navigatorKey.currentState;
-            if (navigatorState.canPop()) {
-              --depth;
-              navigatorState.pop();
-            }
-          },
-          onNextPressed: () {
-            navigatorKey.currentState.pushNamed<void>(
-              '/next',
-              arguments: depth + 1,
-            );
-          },
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            depth > 0
+                ? IconButton(
+                    icon: Icon(Icons.arrow_back_ios),
+                    onPressed: () {
+                      final navigatorState = navigatorKey.currentState;
+                      if (navigatorState.canPop()) {
+                        setState(() {
+                          --depth;
+                        });
+                        navigatorState.pop();
+                      }
+                    },
+                  )
+                : SizedBox.shrink(),
+            IconButton(
+              icon: Icon(Icons.arrow_forward_ios),
+              onPressed: () {
+                setState(() {
+                  ++depth;
+                });
+                navigatorKey.currentState.pushNamed<T>(
+                  '/next',
+                );
+              },
+            ),
+          ],
         ),
         Expanded(
           child: Navigator(
             key: navigatorKey,
             onGenerateRoute: (settings) {
-              depth = settings.arguments as int ?? 0;
-              return route(depth);
+              return widget.nextRoute(depth);
             },
           ),
         ),
-      ],
-    );
-  }
-
-  Route<void> route(int depth) {
-    return MaterialPageRoute<void>(
-      builder: (context) {
-        return _ColorWidget(depth: depth);
-      },
-    );
-  }
-}
-
-class _NavigationControls extends StatelessWidget {
-  final VoidCallback onPreviousPressed;
-  final VoidCallback onNextPressed;
-
-  const _NavigationControls({
-    this.onPreviousPressed,
-    this.onNextPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        if (onPreviousPressed != null)
-          IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: onPreviousPressed,
-          ),
-        if (onNextPressed != null)
-          IconButton(
-            icon: Icon(Icons.arrow_forward_ios),
-            onPressed: onNextPressed,
-          ),
       ],
     );
   }
