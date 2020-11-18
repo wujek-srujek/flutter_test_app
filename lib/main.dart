@@ -60,13 +60,13 @@ class _NavigatorSubPage extends StatelessWidget {
       children: [
         _NavigationControls(
           onPreviousPressed: () {
-            final navigatorState = Navigator.of(navigatorKey.currentContext);
+            final navigatorState = navigatorKey.currentState;
             if (navigatorState.canPop()) {
               navigatorState.pop();
             }
           },
           onNextPressed: () {
-            Navigator.of(navigatorKey.currentContext).pushNamed<void>(
+            navigatorKey.currentState.pushNamed<void>(
               '/next',
               arguments: 0,
             );
