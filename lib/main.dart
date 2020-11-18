@@ -52,8 +52,14 @@ class _Page extends StatelessWidget {
   }
 }
 
-class _NavigatorSubPage extends StatelessWidget {
+class _NavigatorSubPage extends StatefulWidget {
+  @override
+  _NavigatorSubPageState createState() => _NavigatorSubPageState();
+}
+
+class _NavigatorSubPageState extends State<_NavigatorSubPage> {
   final navigatorKey = GlobalKey<NavigatorState>();
+  int depth;
 
   Widget build(BuildContext context) {
     return Column(
@@ -62,13 +68,14 @@ class _NavigatorSubPage extends StatelessWidget {
           onPreviousPressed: () {
             final navigatorState = navigatorKey.currentState;
             if (navigatorState.canPop()) {
+              --depth;
               navigatorState.pop();
             }
           },
           onNextPressed: () {
             navigatorKey.currentState.pushNamed<void>(
               '/next',
-              arguments: 0,
+              arguments: depth + 1,
             );
           },
         ),
@@ -76,7 +83,8 @@ class _NavigatorSubPage extends StatelessWidget {
           child: Navigator(
             key: navigatorKey,
             onGenerateRoute: (settings) {
-              return route(0);
+              depth = settings.arguments as int ?? 0;
+              return route(depth);
             },
           ),
         ),
