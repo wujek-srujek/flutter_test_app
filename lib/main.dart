@@ -10,14 +10,6 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  bool showCounterFirst;
-
-  @override
-  void initState() {
-    super.initState();
-    showCounterFirst = true;
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,9 +20,7 @@ class _AppState extends State<App> {
               builder: (context) => IconButton(
                 icon: Icon(Icons.swap_vert),
                 onPressed: () {
-                  setState(() {
-                    showCounterFirst = !showCounterFirst;
-                  });
+                  setState(() {});
                   final scaffoldState = Scaffold.of(context);
                   scaffoldState.hideCurrentSnackBar();
                   scaffoldState.showSnackBar(
@@ -42,15 +32,10 @@ class _AppState extends State<App> {
           ],
         ),
         body: Column(
-          children: showCounterFirst
-              ? [
-                  CounterWidget(key: Key('counter_key')),
-                  Text('Blah', style: Theme.of(context).textTheme.headline4),
-                ]
-              : [
-                  Text('Blah', style: Theme.of(context).textTheme.headline4),
-                  CounterWidget(key: Key('counter_key')),
-                ],
+          children: [
+            CounterWidget(),
+            CounterWidget(),
+          ],
         ),
       ),
     );
