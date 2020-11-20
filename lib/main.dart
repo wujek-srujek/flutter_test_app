@@ -29,22 +29,20 @@ class _AppState extends State<App> {
       home: Scaffold(
         appBar: AppBar(
           actions: [
-            Builder(
-              builder: (context) => IconButton(
-                icon: Icon(Icons.swap_vert),
-                onPressed: () {
-                  setState(() {
-                    final tmp = topKey;
-                    topKey = bottomKey;
-                    bottomKey = tmp;
-                  });
-                  final scaffoldState = Scaffold.of(context);
-                  scaffoldState.hideCurrentSnackBar();
-                  scaffoldState.showSnackBar(
-                    SnackBar(content: Text('Swapped')),
-                  );
-                },
-              ),
+            IconButton(
+              icon: Icon(Icons.swap_vert),
+              onPressed: () {
+                setState(() {
+                  final tmp = topKey;
+                  topKey = bottomKey;
+                  bottomKey = tmp;
+                });
+                final scaffoldState = Scaffold.of(context);
+                scaffoldState.hideCurrentSnackBar();
+                scaffoldState.showSnackBar(
+                  SnackBar(content: Text('Swapped')),
+                );
+              },
             ),
           ],
         ),
