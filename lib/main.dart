@@ -10,12 +10,12 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  bool showsSubtitle;
+  bool showCounterFirst;
 
   @override
   void initState() {
     super.initState();
-    showsSubtitle = false;
+    showCounterFirst = true;
   }
 
   @override
@@ -26,15 +26,15 @@ class _AppState extends State<App> {
           actions: [
             Builder(
               builder: (context) => IconButton(
-                icon: Icon(Icons.replay),
+                icon: Icon(Icons.swap_vert),
                 onPressed: () {
                   setState(() {
-                    showsSubtitle = !showsSubtitle;
+                    showCounterFirst = !showCounterFirst;
                   });
                   final scaffoldState = Scaffold.of(context);
                   scaffoldState.hideCurrentSnackBar();
                   scaffoldState.showSnackBar(
-                    SnackBar(content: Text('Reloaded')),
+                    SnackBar(content: Text('Swapped')),
                   );
                 },
               ),
@@ -42,12 +42,13 @@ class _AppState extends State<App> {
           ],
         ),
         body: Column(
-          children: showsSubtitle
+          children: showCounterFirst
               ? [
                   CounterWidget(),
                   Text('Blah', style: Theme.of(context).textTheme.headline4),
                 ]
               : [
+                  Text('Blah', style: Theme.of(context).textTheme.headline4),
                   CounterWidget(),
                 ],
         ),
