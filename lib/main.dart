@@ -10,12 +10,17 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  bool redFirst;
+  final firstCounterKey = Key('first_counter_key');
+  final secondCounterKey = Key('second_counter_key');
+
+  Key topKey;
+  Key bottomKey;
 
   @override
   void initState() {
     super.initState();
-    redFirst = true;
+    topKey = firstCounterKey;
+    bottomKey = secondCounterKey;
   }
 
   @override
@@ -29,7 +34,9 @@ class _AppState extends State<App> {
                 icon: Icon(Icons.swap_vert),
                 onPressed: () {
                   setState(() {
-                    redFirst = !redFirst;
+                    final tmp = topKey;
+                    topKey = bottomKey;
+                    bottomKey = tmp;
                   });
                   final scaffoldState = Scaffold.of(context);
                   scaffoldState.hideCurrentSnackBar();
@@ -42,15 +49,10 @@ class _AppState extends State<App> {
           ],
         ),
         body: Column(
-          children: redFirst
-              ? [
-                  CounterWidget(color: Colors.red),
-                  CounterWidget(color: Colors.green),
-                ]
-              : [
-                  CounterWidget(color: Colors.green),
-                  CounterWidget(color: Colors.red),
-                ],
+          children: [
+            CounterWidget(key: topKey),
+            CounterWidget(key: bottomKey),
+          ],
         ),
       ),
     );
@@ -58,9 +60,7 @@ class _AppState extends State<App> {
 }
 
 class CounterWidget extends StatefulWidget {
-  final Color color;
-
-  const CounterWidget({this.color});
+  const CounterWidget({Key key}) : super(key: key);
 
   @override
   _CounterWidgetState createState() => _CounterWidgetState();
@@ -79,7 +79,6 @@ class _CounterWidgetState extends State<CounterWidget> {
   Widget build(BuildContext context) {
     print('### _CounterWidgetState.build()');
     return Container(
-      color: widget.color,
       child: Center(
         child: Column(
           children: [
