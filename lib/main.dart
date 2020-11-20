@@ -36,24 +36,25 @@ class _AppState extends State<App> {
             ),
           ],
         ),
-        body: Column(
-          children: showCounterFirst
-              ? [
-                  BlocProvider(
-                    key: Key('bloc_key'),
-                    create: (context) => CounterBloc(),
-                    child: CounterWidget(),
-                  ),
-                  Text('Blah', style: Theme.of(context).textTheme.headline4),
-                ]
-              : [
-                  Text('Blah', style: Theme.of(context).textTheme.headline4),
-                  BlocProvider(
-                    key: Key('bloc_key'),
-                    create: (context) => CounterBloc(),
-                    child: CounterWidget(),
-                  ),
-                ],
+        body: BlocProvider(
+          create: (context) => CounterBloc(),
+          child: Column(
+            children: showCounterFirst
+                ? [
+                    CounterWidget(),
+                    Text(
+                      'Blah',
+                      style: Theme.of(context).textTheme.headline4,
+                    ),
+                  ]
+                : [
+                    Text(
+                      'Blah',
+                      style: Theme.of(context).textTheme.headline4,
+                    ),
+                    CounterWidget(),
+                  ],
+          ),
         ),
       ),
     );
