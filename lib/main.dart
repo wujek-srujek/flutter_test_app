@@ -40,6 +40,7 @@ class _AppState extends State<App> {
           children: showCounterFirst
               ? [
                   BlocProvider(
+                    key: Key('bloc_key'),
                     create: (context) => CounterBloc(),
                     child: CounterWidget(),
                   ),
@@ -48,6 +49,7 @@ class _AppState extends State<App> {
               : [
                   Text('Blah', style: Theme.of(context).textTheme.headline4),
                   BlocProvider(
+                    key: Key('bloc_key'),
                     create: (context) => CounterBloc(),
                     child: CounterWidget(),
                   ),
