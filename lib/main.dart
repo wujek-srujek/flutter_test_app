@@ -17,10 +17,6 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     print('### _AppState.build()');
 
-    final counterBloc = CounterBloc();
-    final blocA = DummyBlocA(counterBloc);
-    final blocB = DummyBlocB(blocA);
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -35,14 +31,18 @@ class _AppState extends State<App> {
         ),
         body: MultiBlocProvider(
           providers: [
-            LoggingCounterBlocProvider.value(
-              value: counterBloc,
+            LoggingCounterBlocProvider(
+              create: (context) => CounterBloc(),
             ),
             BlocProvider<DummyBlocA>(
-              create: (context) => blocA,
+              create: (context) => DummyBlocA(
+                BlocProvider.of<CounterBloc>(context),
+              ),
             ),
             BlocProvider<DummyBlocB>(
-              create: (context) => blocB,
+              create: (context) => DummyBlocB(
+                BlocProvider.of<DummyBlocA>(context),
+              ),
             ),
           ],
           child: CounterWidget(),
