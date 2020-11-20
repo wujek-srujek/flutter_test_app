@@ -16,6 +16,11 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     print('### _AppState.build()');
+
+    final counterBloc = CounterBloc();
+    final blocA = DummyBlocA(counterBloc);
+    final blocB = DummyBlocB(blocA);
+
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -28,11 +33,18 @@ class _AppState extends State<App> {
             ),
           ],
         ),
-        body: LoggingCounterBlocProvider(
-          create: (context) {
-            print('### BlocProvider.create()');
-            return CounterBloc();
-          },
+        body: MultiBlocProvider(
+          providers: [
+            LoggingCounterBlocProvider(
+              create: (context) => counterBloc,
+            ),
+            BlocProvider<DummyBlocA>(
+              create: (context) => blocA,
+            ),
+            BlocProvider<DummyBlocB>(
+              create: (context) => blocB,
+            ),
+          ],
           child: CounterWidget(),
         ),
       ),
@@ -66,10 +78,17 @@ class CounterWidget extends StatelessWidget {
   }
 }
 
+// CounterBloc
+
 class LoggingCounterBlocProvider extends BlocProvider<CounterBloc> {
   LoggingCounterBlocProvider({ValueBuilder<CounterBloc> create, Widget child})
       : super(create: create, child: child) {
     print('### LoggingCounterBlocProvider()');
+  }
+
+  LoggingCounterBlocProvider.value({CounterBloc value, Widget child})
+      : super.value(value: value, child: child) {
+    print('### LoggingCounterBlocProvider.value()');
   }
 }
 
@@ -88,4 +107,36 @@ class CounterBloc extends Bloc<IncrementedEvent, int> {
     print('### $hashCode CounterBloc.mapEventToState(${event.runtimeType})');
     yield state + 1;
   }
+}
+
+// DummyBlocA
+
+class DummyBlocA extends Bloc<void, void> {
+  final CounterBloc counterBloc;
+
+  DummyBlocA(this.counterBloc) {
+    print('### DummyBlocA()');
+  }
+
+  @override
+  void get initialState => null;
+
+  @override
+  Stream<void> mapEventToState(void event) async* {}
+}
+
+// DummyBlocB
+
+class DummyBlocB extends Bloc<void, void> {
+  final DummyBlocA blocA;
+
+  DummyBlocB(this.blocA) {
+    print('### DummyBlocB()');
+  }
+
+  @override
+  void get initialState => null;
+
+  @override
+  Stream<void> mapEventToState(void event) async* {}
 }
