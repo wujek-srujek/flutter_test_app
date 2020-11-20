@@ -13,6 +13,8 @@ class _AppState extends State<App> {
   final firstCounterKey = Key('first_counter_key');
   final secondCounterKey = Key('second_counter_key');
 
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   Key topKey;
   Key bottomKey;
 
@@ -27,6 +29,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        key: scaffoldKey,
         appBar: AppBar(
           actions: [
             IconButton(
@@ -37,7 +40,7 @@ class _AppState extends State<App> {
                   topKey = bottomKey;
                   bottomKey = tmp;
                 });
-                final scaffoldState = Scaffold.of(context);
+                final scaffoldState = scaffoldKey.currentState;
                 scaffoldState.hideCurrentSnackBar();
                 scaffoldState.showSnackBar(
                   SnackBar(content: Text('Swapped')),
