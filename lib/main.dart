@@ -44,12 +44,12 @@ class _AppState extends State<App> {
         body: Column(
           children: showCounterFirst
               ? [
-                  CounterWidget(),
+                  CounterWidget(key: Key('counter_key')),
                   Text('Blah', style: Theme.of(context).textTheme.headline4),
                 ]
               : [
                   Text('Blah', style: Theme.of(context).textTheme.headline4),
-                  CounterWidget(),
+                  CounterWidget(key: Key('counter_key')),
                 ],
         ),
       ),
@@ -58,6 +58,8 @@ class _AppState extends State<App> {
 }
 
 class CounterWidget extends StatefulWidget {
+  const CounterWidget({Key key}) : super(key: key);
+
   @override
   _CounterWidgetState createState() => _CounterWidgetState();
 }
