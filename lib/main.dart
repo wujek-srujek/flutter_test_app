@@ -10,6 +10,14 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  bool showsSubtitle;
+
+  @override
+  void initState() {
+    super.initState();
+    showsSubtitle = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,7 +28,9 @@ class _AppState extends State<App> {
               builder: (context) => IconButton(
                 icon: Icon(Icons.replay),
                 onPressed: () {
-                  setState(() {});
+                  setState(() {
+                    showsSubtitle = !showsSubtitle;
+                  });
                   final scaffoldState = Scaffold.of(context);
                   scaffoldState.hideCurrentSnackBar();
                   scaffoldState.showSnackBar(
@@ -31,7 +41,16 @@ class _AppState extends State<App> {
             ),
           ],
         ),
-        body: CounterWidget(),
+        body: Column(
+          children: showsSubtitle
+              ? [
+                  CounterWidget(),
+                  Text('Blah', style: Theme.of(context).textTheme.headline4),
+                ]
+              : [
+                  CounterWidget(),
+                ],
+        ),
       ),
     );
   }
