@@ -35,8 +35,8 @@ class _AppState extends State<App> {
         ),
         body: MultiBlocProvider(
           providers: [
-            LoggingCounterBlocProvider(
-              create: (context) => counterBloc,
+            LoggingCounterBlocProvider.value(
+              value: counterBloc,
             ),
             BlocProvider<DummyBlocA>(
               create: (context) => blocA,
