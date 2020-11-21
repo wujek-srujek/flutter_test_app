@@ -11,11 +11,13 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   bool showCounterFirst;
+  int swapCount;
 
   @override
   void initState() {
     super.initState();
     showCounterFirst = true;
+    swapCount = 0;
   }
 
   @override
@@ -35,6 +37,7 @@ class _AppState extends State<App> {
               onPressed: () {
                 setState(() {
                   showCounterFirst = !showCounterFirst;
+                  ++swapCount;
                 });
               },
             ),
@@ -43,12 +46,12 @@ class _AppState extends State<App> {
         body: Column(
           children: showCounterFirst
               ? [
-                  CounterWidget(),
+                  CounterWidget(key: Key('counter_key'), swapCount: swapCount),
                   Text('Blabla', style: Theme.of(context).textTheme.headline4),
                 ]
               : [
                   Text('Blabla', style: Theme.of(context).textTheme.headline4),
-                  CounterWidget(),
+                  CounterWidget(key: Key('counter_key'), swapCount: swapCount),
                 ],
         ),
       ),
@@ -57,7 +60,9 @@ class _AppState extends State<App> {
 }
 
 class CounterWidget extends StatefulWidget {
-  const CounterWidget({Key key}) : super(key: key);
+  final int swapCount;
+
+  const CounterWidget({Key key, @required this.swapCount}) : super(key: key);
 
   @override
   _CounterWidgetState createState() => _CounterWidgetState();
@@ -77,6 +82,7 @@ class _CounterWidgetState extends State<CounterWidget> {
   void didUpdateWidget(covariant CounterWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     print('### $hashCode _CounterWidgetState.didUpdateWidget()');
+    count += (widget.swapCount - oldWidget.swapCount) * 100;
   }
 
   @override
