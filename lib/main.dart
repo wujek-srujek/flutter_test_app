@@ -10,50 +10,46 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final firstCounterKey = Key('first_counter_key');
-  final secondCounterKey = Key('second_counter_key');
-
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-
-  Key topKey;
-  Key bottomKey;
+  bool showCounterFirst;
 
   @override
   void initState() {
     super.initState();
-    topKey = firstCounterKey;
-    bottomKey = secondCounterKey;
+    showCounterFirst = true;
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        key: scaffoldKey,
         appBar: AppBar(
           actions: [
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                setState(() {});
+              },
+            ),
             IconButton(
               icon: Icon(Icons.swap_vert),
               onPressed: () {
                 setState(() {
-                  final tmp = topKey;
-                  topKey = bottomKey;
-                  bottomKey = tmp;
+                  showCounterFirst = !showCounterFirst;
                 });
-                final scaffoldState = scaffoldKey.currentState;
-                scaffoldState.hideCurrentSnackBar();
-                scaffoldState.showSnackBar(
-                  SnackBar(content: Text('Swapped')),
-                );
               },
             ),
           ],
         ),
         body: Column(
-          children: [
-            CounterWidget(key: topKey),
-            CounterWidget(key: bottomKey),
-          ],
+          children: showCounterFirst
+              ? [
+                  CounterWidget(),
+                  Text('Blabla', style: Theme.of(context).textTheme.headline4),
+                ]
+              : [
+                  Text('Blabla', style: Theme.of(context).textTheme.headline4),
+                  CounterWidget(),
+                ],
         ),
       ),
     );
@@ -74,6 +70,37 @@ class _CounterWidgetState extends State<CounterWidget> {
   void initState() {
     super.initState();
     count = 0;
+    print('### $hashCode _CounterWidgetState.initState()');
+  }
+
+  @override
+  void didUpdateWidget(covariant CounterWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('### $hashCode _CounterWidgetState.didUpdateWidget()');
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print('### $hashCode _CounterWidgetState.didChangeDependencies()');
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    print('### $hashCode _CounterWidgetState.deactivate()');
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print('### $hashCode _CounterWidgetState.dispose()');
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    print('### _CounterWidgetState.reassemble()');
   }
 
   @override
