@@ -10,6 +10,14 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  bool redFirst;
+
+  @override
+  void initState() {
+    super.initState();
+    redFirst = true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,7 +28,9 @@ class _AppState extends State<App> {
               builder: (context) => IconButton(
                 icon: Icon(Icons.swap_vert),
                 onPressed: () {
-                  setState(() {});
+                  setState(() {
+                    redFirst = !redFirst;
+                  });
                   final scaffoldState = Scaffold.of(context);
                   scaffoldState.hideCurrentSnackBar();
                   scaffoldState.showSnackBar(
@@ -32,10 +42,15 @@ class _AppState extends State<App> {
           ],
         ),
         body: Column(
-          children: [
-            CounterWidget(),
-            CounterWidget(),
-          ],
+          children: redFirst
+              ? [
+                  CounterWidget(color: Colors.red),
+                  CounterWidget(color: Colors.green),
+                ]
+              : [
+                  CounterWidget(color: Colors.green),
+                  CounterWidget(color: Colors.red),
+                ],
         ),
       ),
     );
@@ -43,7 +58,9 @@ class _AppState extends State<App> {
 }
 
 class CounterWidget extends StatefulWidget {
-  const CounterWidget({Key key}) : super(key: key);
+  final Color color;
+
+  const CounterWidget({this.color});
 
   @override
   _CounterWidgetState createState() => _CounterWidgetState();
@@ -61,19 +78,22 @@ class _CounterWidgetState extends State<CounterWidget> {
   @override
   Widget build(BuildContext context) {
     print('### _CounterWidgetState.build()');
-    return Center(
-      child: Column(
-        children: [
-          Text('$count', style: Theme.of(context).textTheme.headline2),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                ++count;
-              });
-            },
-            child: Icon(Icons.add),
-          )
-        ],
+    return Container(
+      color: widget.color,
+      child: Center(
+        child: Column(
+          children: [
+            Text('$count', style: Theme.of(context).textTheme.headline2),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  ++count;
+                });
+              },
+              child: Icon(Icons.add),
+            )
+          ],
+        ),
       ),
     );
   }
