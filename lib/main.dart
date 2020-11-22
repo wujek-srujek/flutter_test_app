@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,6 +14,7 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
+    print('### _AppState.build()');
     final counterWidget = CounterWidget();
     return MaterialApp(
       home: Scaffold(
@@ -28,8 +31,12 @@ class _AppState extends State<App> {
         body: Column(
           children: [
             counterWidget,
-            counterWidget,
-            counterWidget,
+            StreamBuilder<int>(
+              stream: counterWidget.currentCount,
+              builder: (context, snapshot) {
+                return Text('Current count is: ${snapshot.data}');
+              },
+            ),
           ],
         ),
       ),
@@ -38,17 +45,25 @@ class _AppState extends State<App> {
 }
 
 class CounterWidget extends StatefulWidget {
+  final _CounterWidgetState _state;
+
+  CounterWidget() : _state = _CounterWidgetState();
+
   @override
-  _CounterWidgetState createState() => _CounterWidgetState();
+  _CounterWidgetState createState() => _state;
+
+  Stream<int> get currentCount => _state.controller.stream;
 }
 
 class _CounterWidgetState extends State<CounterWidget> {
   int count;
+  StreamController<int> controller = StreamController();
 
   @override
   void initState() {
     super.initState();
     count = 0;
+    controller.sink.add(count);
     print('### $hashCode _CounterWidgetState.initState()');
   }
 
@@ -73,6 +88,7 @@ class _CounterWidgetState extends State<CounterWidget> {
   @override
   void dispose() {
     super.dispose();
+    controller.close();
     print('### $hashCode _CounterWidgetState.dispose()');
   }
 
@@ -94,6 +110,7 @@ class _CounterWidgetState extends State<CounterWidget> {
               onPressed: () {
                 setState(() {
                   ++count;
+                  controller.sink.add(count);
                 });
               },
               child: Icon(Icons.add),
