@@ -29,23 +29,19 @@ class _AppState extends State<App> {
             ),
           ],
         ),
-        body: MultiBlocProvider(
-          providers: [
-            LoggingCounterBlocProvider(
-              create: (context) => CounterBloc(),
+        body: BlocProvider(
+          create: (context) => CounterBloc(),
+          child: BlocProvider(
+            create: (context) => DummyBlocA(
+              BlocProvider.of<CounterBloc>(context),
             ),
-            BlocProvider<DummyBlocA>(
-              create: (context) => DummyBlocA(
-                BlocProvider.of<CounterBloc>(context),
-              ),
-            ),
-            BlocProvider<DummyBlocB>(
+            child: BlocProvider(
               create: (context) => DummyBlocB(
                 BlocProvider.of<DummyBlocA>(context),
               ),
+              child: CounterWidget(),
             ),
-          ],
-          child: CounterWidget(),
+          ),
         ),
       ),
     );
