@@ -10,18 +10,9 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  bool showCounterFirst;
-  int swapCount;
-
-  @override
-  void initState() {
-    super.initState();
-    showCounterFirst = true;
-    swapCount = 0;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final counterWidget = CounterWidget();
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -32,27 +23,14 @@ class _AppState extends State<App> {
                 setState(() {});
               },
             ),
-            IconButton(
-              icon: Icon(Icons.swap_vert),
-              onPressed: () {
-                setState(() {
-                  showCounterFirst = !showCounterFirst;
-                  ++swapCount;
-                });
-              },
-            ),
           ],
         ),
         body: Column(
-          children: showCounterFirst
-              ? [
-                  CounterWidget(key: Key('counter_key'), swapCount: swapCount),
-                  Text('Blabla', style: Theme.of(context).textTheme.headline4),
-                ]
-              : [
-                  Text('Blabla', style: Theme.of(context).textTheme.headline4),
-                  CounterWidget(key: Key('counter_key'), swapCount: swapCount),
-                ],
+          children: [
+            counterWidget,
+            counterWidget,
+            counterWidget,
+          ],
         ),
       ),
     );
@@ -60,10 +38,6 @@ class _AppState extends State<App> {
 }
 
 class CounterWidget extends StatefulWidget {
-  final int swapCount;
-
-  const CounterWidget({Key key, @required this.swapCount}) : super(key: key);
-
   @override
   _CounterWidgetState createState() => _CounterWidgetState();
 }
@@ -82,7 +56,6 @@ class _CounterWidgetState extends State<CounterWidget> {
   void didUpdateWidget(covariant CounterWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     print('### $hashCode _CounterWidgetState.didUpdateWidget()');
-    count += (widget.swapCount - oldWidget.swapCount) * 100;
   }
 
   @override
