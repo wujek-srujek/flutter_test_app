@@ -46,23 +46,29 @@ class _AppState extends State<App> {
   }
 }
 
-class CounterWidget extends StatelessWidget {
+class CounterWidget extends StatefulWidget {
   final CountData countData;
 
   const CounterWidget({@required this.countData});
 
+  @override
+  _CounterWidgetState createState() => _CounterWidgetState();
+}
+
+class _CounterWidgetState extends State<CounterWidget> {
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
           Text(
-            '${countData.value}',
+            '${widget.countData.value}',
             style: Theme.of(context).textTheme.headline2,
           ),
           FloatingActionButton(
             onPressed: () {
-              ++countData.value;
+              ++widget.countData.value;
+              setState(() {});
             },
             child: Icon(Icons.add),
           )
