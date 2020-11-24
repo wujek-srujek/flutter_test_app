@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -46,29 +47,28 @@ class _AppState extends State<App> {
   }
 }
 
-class CounterWidget extends StatefulWidget {
+class CounterWidget extends StatelessWidget {
   final CountData countData;
 
   const CounterWidget({@required this.countData});
 
   @override
-  _CounterWidgetState createState() => _CounterWidgetState();
-}
-
-class _CounterWidgetState extends State<CounterWidget> {
-  @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
-          Text(
-            '${widget.countData.value}',
-            style: Theme.of(context).textTheme.headline2,
+          ValueListenableBuilder<int>(
+            valueListenable: countData,
+            builder: (context, value, _) {
+              return Text(
+                '$value',
+                style: Theme.of(context).textTheme.headline2,
+              );
+            },
           ),
           FloatingActionButton(
             onPressed: () {
-              ++widget.countData.value;
-              setState(() {});
+              ++countData.value;
             },
             child: Icon(Icons.add),
           )
@@ -126,9 +126,14 @@ class DescendantLevel3 extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Container(
           color: Colors.white,
-          child: Text(
-            '${countData.value}',
-            style: Theme.of(context).textTheme.headline2,
+          child: ValueListenableBuilder<int>(
+            valueListenable: countData,
+            builder: (context, value, _) {
+              return Text(
+                '$value',
+                style: Theme.of(context).textTheme.headline2,
+              );
+            },
           ),
         ),
       ),
