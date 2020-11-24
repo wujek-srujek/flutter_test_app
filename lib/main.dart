@@ -8,37 +8,87 @@ class CountData extends ValueNotifier<int> {
   CountData(int value) : super(value);
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  CountData countData;
+
+  @override
+  void initState() {
+    super.initState();
+    countData = CountData(0);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    countData.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            CounterWidget(),
-            Divider(color: Colors.black, thickness: 8),
-            DescendantLevel1(),
-          ],
+        body: ValueListenableBuilder<int>(
+          valueListenable: countData,
+          builder: (context, value, child) {
+            return InheritedCountData(
+              countData: countData,
+              child: child,
+            );
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              CounterWidget(),
+              Divider(color: Colors.black, thickness: 8),
+              DescendantLevel1(),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+class InheritedCountData extends InheritedWidget {
+  final CountData countData;
+
+  InheritedCountData({
+    @required this.countData,
+    @required Widget child,
+  }) : super(child: child);
+
+  @override
+  bool updateShouldNotify(InheritedWidget oldWidget) => true;
+
+  static CountData of(BuildContext context) {
+    final inheritedData =
+        context.dependOnInheritedWidgetOfExactType<InheritedCountData>();
+    return inheritedData.countData;
+  }
+}
+
 class CounterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print('### CounterWidget.build()');
+
+    final countData = InheritedCountData.of(context);
+
     return Center(
       child: Column(
         children: [
           Text(
-            '<count>',
+            '${countData.value}',
             style: Theme.of(context).textTheme.headline2,
           ),
           FloatingActionButton(
-            onPressed: () {},
+            onPressed: () => ++countData.value,
             child: Icon(Icons.add),
           )
         ],
@@ -50,6 +100,8 @@ class CounterWidget extends StatelessWidget {
 class DescendantLevel1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print('### DescendantLevel1.build()');
+
     return Container(
       color: Colors.red,
       child: Padding(
@@ -63,6 +115,8 @@ class DescendantLevel1 extends StatelessWidget {
 class DescendantLevel2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print('### DescendantLevel2.build()');
+
     return Container(
       color: Colors.green,
       child: Padding(
@@ -76,6 +130,10 @@ class DescendantLevel2 extends StatelessWidget {
 class DescendantLevel3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print('### DescendantLevel3.build()');
+
+    final countData = InheritedCountData.of(context);
+
     return Container(
       alignment: Alignment.center,
       color: Colors.blue,
@@ -84,7 +142,7 @@ class DescendantLevel3 extends StatelessWidget {
         child: Container(
           color: Colors.white,
           child: Text(
-            '<count>',
+            '${countData.value}',
             style: Theme.of(context).textTheme.headline2,
           ),
         ),
