@@ -4,6 +4,10 @@ void main() {
   runApp(App());
 }
 
+class CountData extends ValueNotifier<int> {
+  CountData(int value) : super(value);
+}
+
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
