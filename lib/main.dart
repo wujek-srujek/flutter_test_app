@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -9,26 +8,7 @@ class CountData extends ValueNotifier<int> {
   CountData(int value) : super(value);
 }
 
-class App extends StatefulWidget {
-  @override
-  _AppState createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  CountData countData;
-
-  @override
-  void initState() {
-    super.initState();
-    countData = CountData(0);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    countData.dispose();
-  }
-
+class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,9 +17,9 @@ class _AppState extends State<App> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            CounterWidget(countData: countData),
+            CounterWidget(),
             Divider(color: Colors.black, thickness: 8),
-            DescendantLevel1(countData: countData),
+            DescendantLevel1(),
           ],
         ),
       ),
@@ -48,28 +28,17 @@ class _AppState extends State<App> {
 }
 
 class CounterWidget extends StatelessWidget {
-  final CountData countData;
-
-  const CounterWidget({@required this.countData});
-
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
-          ValueListenableBuilder<int>(
-            valueListenable: countData,
-            builder: (context, value, _) {
-              return Text(
-                '$value',
-                style: Theme.of(context).textTheme.headline2,
-              );
-            },
+          Text(
+            '<count>',
+            style: Theme.of(context).textTheme.headline2,
           ),
           FloatingActionButton(
-            onPressed: () {
-              ++countData.value;
-            },
+            onPressed: () {},
             child: Icon(Icons.add),
           )
         ],
@@ -79,44 +48,32 @@ class CounterWidget extends StatelessWidget {
 }
 
 class DescendantLevel1 extends StatelessWidget {
-  final CountData countData;
-
-  const DescendantLevel1({@required this.countData});
-
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.red,
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: DescendantLevel2(countData: countData),
+        child: DescendantLevel2(),
       ),
     );
   }
 }
 
 class DescendantLevel2 extends StatelessWidget {
-  final CountData countData;
-
-  const DescendantLevel2({@required this.countData});
-
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.green,
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: DescendantLevel3(countData: countData),
+        child: DescendantLevel3(),
       ),
     );
   }
 }
 
 class DescendantLevel3 extends StatelessWidget {
-  final CountData countData;
-
-  const DescendantLevel3({@required this.countData});
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -126,14 +83,9 @@ class DescendantLevel3 extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Container(
           color: Colors.white,
-          child: ValueListenableBuilder<int>(
-            valueListenable: countData,
-            builder: (context, value, _) {
-              return Text(
-                '$value',
-                style: Theme.of(context).textTheme.headline2,
-              );
-            },
+          child: Text(
+            '<count>',
+            style: Theme.of(context).textTheme.headline2,
           ),
         ),
       ),
