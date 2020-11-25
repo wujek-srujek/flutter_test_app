@@ -1,43 +1,19 @@
 import 'package:flutter/material.dart';
 
+import 'provider.dart';
+
 void main() {
   runApp(App());
 }
 
-final inheritedCoundDataKey = GlobalKey();
-
-class CountData extends ValueNotifier<int> {
-  CountData(int value) : super(value);
-}
-
-class App extends StatefulWidget {
-  @override
-  _AppState createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  CountData countData;
-
-  @override
-  void initState() {
-    super.initState();
-    countData = CountData(0);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    countData.dispose();
-  }
-
+class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(),
-        body: InheritedCountData(
-          key: inheritedCoundDataKey,
-          countData: countData,
+        body: ValueNotifierProvider<int>(
+          create: (context) => ValueNotifier(0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -52,37 +28,12 @@ class _AppState extends State<App> {
   }
 }
 
-class InheritedCountData extends InheritedNotifier<CountData> {
-  InheritedCountData({
-    Key key,
-    @required CountData countData,
-    @required Widget child,
-  }) : super(key: key, child: child, notifier: countData);
-
-  static CountData of(BuildContext context) {
-    final inheritedData =
-        context.dependOnInheritedWidgetOfExactType<InheritedCountData>();
-    return inheritedData.notifier;
-  }
-}
-
-class CounterWidget extends StatefulWidget {
-  @override
-  _CounterWidgetState createState() => _CounterWidgetState();
-}
-
-class _CounterWidgetState extends State<CounterWidget> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print('### CounterWidget.didChangeDependencies()');
-  }
-
+class CounterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('### CounterWidget.build()');
 
-    final countData = InheritedCountData.of(context);
+    final countData = ValueNotifierProvider.of<int>(context);
 
     return Center(
       child: Column(
@@ -136,8 +87,7 @@ class DescendantLevel3 extends StatelessWidget {
   Widget build(BuildContext context) {
     print('### DescendantLevel3.build()');
 
-    final countData =
-        (inheritedCoundDataKey.currentWidget as InheritedCountData).notifier;
+    final countData = ValueNotifierProvider.of<int>(context);
 
     return Container(
       alignment: Alignment.center,
