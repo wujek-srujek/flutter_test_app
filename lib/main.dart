@@ -73,7 +73,18 @@ class InheritedCountData extends InheritedWidget {
   }
 }
 
-class CounterWidget extends StatelessWidget {
+class CounterWidget extends StatefulWidget {
+  @override
+  _CounterWidgetState createState() => _CounterWidgetState();
+}
+
+class _CounterWidgetState extends State<CounterWidget> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print('### CounterWidget.didChangeDependencies()');
+  }
+
   @override
   Widget build(BuildContext context) {
     print('### CounterWidget.build()');
