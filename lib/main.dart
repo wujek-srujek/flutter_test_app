@@ -33,14 +33,8 @@ class _AppState extends State<App> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(),
-        body: ValueListenableBuilder<int>(
-          valueListenable: countData,
-          builder: (context, value, child) {
-            return InheritedCountData(
-              countData: countData,
-              child: child,
-            );
-          },
+        body: InheritedCountData(
+          countData: countData,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -55,21 +49,16 @@ class _AppState extends State<App> {
   }
 }
 
-class InheritedCountData extends InheritedWidget {
-  final CountData countData;
-
+class InheritedCountData extends InheritedNotifier<CountData> {
   InheritedCountData({
-    @required this.countData,
+    @required CountData countData,
     @required Widget child,
-  }) : super(child: child);
-
-  @override
-  bool updateShouldNotify(InheritedWidget oldWidget) => false;
+  }) : super(child: child, notifier: countData);
 
   static CountData of(BuildContext context) {
     final inheritedData =
         context.dependOnInheritedWidgetOfExactType<InheritedCountData>();
-    return inheritedData.countData;
+    return inheritedData.notifier;
   }
 }
 
