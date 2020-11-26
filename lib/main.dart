@@ -64,7 +64,7 @@ class InheritedCountData extends InheritedWidget {
   }) : super(child: child);
 
   @override
-  bool updateShouldNotify(InheritedWidget oldWidget) => true;
+  bool updateShouldNotify(InheritedWidget oldWidget) => false;
 
   static CountData of(BuildContext context) {
     final inheritedData =
