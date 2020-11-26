@@ -4,6 +4,8 @@ void main() {
   runApp(App());
 }
 
+final inheritedCoundDataKey = GlobalKey();
+
 class CountData extends ValueNotifier<int> {
   CountData(int value) : super(value);
 }
@@ -34,6 +36,7 @@ class _AppState extends State<App> {
       home: Scaffold(
         appBar: AppBar(),
         body: InheritedCountData(
+          key: inheritedCoundDataKey,
           countData: countData,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -51,9 +54,10 @@ class _AppState extends State<App> {
 
 class InheritedCountData extends InheritedNotifier<CountData> {
   InheritedCountData({
+    Key key,
     @required CountData countData,
     @required Widget child,
-  }) : super(child: child, notifier: countData);
+  }) : super(key: key, child: child, notifier: countData);
 
   static CountData of(BuildContext context) {
     final inheritedData =
@@ -132,7 +136,8 @@ class DescendantLevel3 extends StatelessWidget {
   Widget build(BuildContext context) {
     print('### DescendantLevel3.build()');
 
-    final countData = InheritedCountData.of(context);
+    final countData =
+        (inheritedCoundDataKey.currentWidget as InheritedCountData).notifier;
 
     return Container(
       alignment: Alignment.center,
