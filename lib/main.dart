@@ -10,13 +10,21 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('<count>'),
-        ),
-        body: ValueNotifierProvider<int>(
-          create: (context) => ValueNotifier(0),
-          child: Column(
+      home: ValueNotifierProvider<int>(
+        create: (context) => ValueNotifier(0),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Builder(
+              builder: (context) {
+                print('### App.Scaffold.AppBar.Title.build()');
+
+                final countData = ValueNotifierProvider.of<int>(context);
+
+                return Text('${countData.value}');
+              },
+            ),
+          ),
+          body: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               CounterWidget(),
