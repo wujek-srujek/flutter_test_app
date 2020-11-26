@@ -13,15 +13,7 @@ class App extends StatelessWidget {
         create: (context) => ValueNotifier(0),
         child: Scaffold(
           appBar: AppBar(
-            title: Builder(
-              builder: (context) {
-                print('### App.Scaffold.AppBar.Title.build()');
-
-                final countData = Provider.of<ValueNotifier<int>>(context);
-
-                return Text('${countData.value}');
-              },
-            ),
+            title: CountText(large: false),
           ),
           body: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -42,18 +34,20 @@ class CounterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     print('### CounterWidget.build()');
 
-    final countData = Provider.of<ValueNotifier<int>>(context);
-
     return Center(
       child: Column(
         children: [
-          Text(
-            '${countData.value}',
-            style: Theme.of(context).textTheme.headline2,
-          ),
-          FloatingActionButton(
-            onPressed: () => ++countData.value,
-            child: Icon(Icons.add),
+          CountText(),
+          Builder(
+            builder: (context) {
+              return FloatingActionButton(
+                onPressed: () {
+                  final countData = Provider.of<ValueNotifier<int>>(context);
+                  ++countData.value;
+                },
+                child: Icon(Icons.add),
+              );
+            },
           )
         ],
       ),
@@ -96,8 +90,6 @@ class DescendantLevel3 extends StatelessWidget {
   Widget build(BuildContext context) {
     print('### DescendantLevel3.build()');
 
-    final countData = Provider.of<ValueNotifier<int>>(context);
-
     return Container(
       alignment: Alignment.center,
       color: Colors.blue,
@@ -105,12 +97,27 @@ class DescendantLevel3 extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Container(
           color: Colors.white,
-          child: Text(
-            '${countData.value}',
-            style: Theme.of(context).textTheme.headline2,
-          ),
+          child: CountText(),
         ),
       ),
+    );
+  }
+}
+
+class CountText extends StatelessWidget {
+  final bool large;
+
+  const CountText({this.large = true});
+
+  @override
+  Widget build(BuildContext context) {
+    print('### $hashCode CountText.build()');
+
+    final countData = Provider.of<ValueNotifier<int>>(context);
+
+    return Text(
+      '${countData.value}',
+      style: large ? Theme.of(context).textTheme.headline2 : null,
     );
   }
 }
