@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(App());
@@ -10,7 +9,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ValueNotifierProvider<int>(
+      home: ListenableProvider(
         create: (context) => ValueNotifier(0),
         child: Scaffold(
           appBar: AppBar(
@@ -18,7 +17,7 @@ class App extends StatelessWidget {
               builder: (context) {
                 print('### App.Scaffold.AppBar.Title.build()');
 
-                final countData = ValueNotifierProvider.of<int>(context);
+                final countData = Provider.of<ValueNotifier<int>>(context);
 
                 return Text('${countData.value}');
               },
@@ -43,7 +42,7 @@ class CounterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     print('### CounterWidget.build()');
 
-    final countData = ValueNotifierProvider.of<int>(context);
+    final countData = Provider.of<ValueNotifier<int>>(context);
 
     return Center(
       child: Column(
@@ -97,7 +96,7 @@ class DescendantLevel3 extends StatelessWidget {
   Widget build(BuildContext context) {
     print('### DescendantLevel3.build()');
 
-    final countData = ValueNotifierProvider.of<int>(context);
+    final countData = Provider.of<ValueNotifier<int>>(context);
 
     return Container(
       alignment: Alignment.center,
