@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_test_app/main.dart';
@@ -49,4 +50,11 @@ void main() {
       expect(yellowContainer.color, Colors.yellow);
     },
   );
+
+  testWidgets('title bar contains the current date', (tester) async {
+    await tester.pumpWidget(App());
+
+    final title = tester.widget<AppBar>(find.byType(AppBar)).title as Text;
+    expect(title.data, '${clock.now()}');
+  });
 }
