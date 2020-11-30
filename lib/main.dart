@@ -13,6 +13,8 @@ class App extends StatelessWidget {
   }
 }
 
+const kSleepDuration = Duration(seconds: 3);
+
 class TabbedPage extends StatefulWidget {
   @override
   _TabbedPageState createState() => _TabbedPageState();
@@ -27,10 +29,13 @@ class _TabbedPageState extends State<TabbedPage>
 
   TabController tabController;
 
+  bool funky;
+
   @override
   void initState() {
     super.initState();
     tabController = TabController(vsync: this, length: tabs.length);
+    funky = false;
   }
 
   @override
@@ -52,10 +57,27 @@ class _TabbedPageState extends State<TabbedPage>
         controller: tabController,
         children: tabs.map((tab) {
           final side = tab.text;
-          return Center(
-            child: Text(
-              'This is the $side tab',
-              style: Theme.of(context).textTheme.headline4,
+          return Container(
+            color: funky ? Colors.yellow : Colors.white,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text(
+                    'This is the $side tab',
+                    style: Theme.of(context).textTheme.headline4,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await Future.delayed(kSleepDuration);
+                    setState(() {
+                      funky = !funky;
+                    });
+                  },
+                  child: Text('Press me'),
+                ),
+              ],
             ),
           );
         }).toList(),
