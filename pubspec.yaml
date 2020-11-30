@@ -6,10 +6,17 @@ environment:
 
 dependencies:
   bloc: ^6.1.0
+  clock:
   flutter_bloc: ^6.1.0
   flutter:
     sdk: flutter
   provider: ^4.0.0
+
+dev_dependencies:
+  fake_async:
+  flutter_test:
+    sdk: flutter
+  test:
 
 flutter:
   uses-material-design: true
