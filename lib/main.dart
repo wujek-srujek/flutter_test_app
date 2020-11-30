@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -48,7 +49,7 @@ class _TabbedPageState extends State<TabbedPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${DateTime.now()}'),
+        title: Text('${clock.now()}'),
         bottom: TabBar(
           controller: tabController,
           tabs: tabs,
