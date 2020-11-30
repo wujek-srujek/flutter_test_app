@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter_test_app/tasks.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -48,5 +49,28 @@ void main() {
       return true;
     });
     expect(result, isTrue);
+  });
+
+  test('calculation finishes with currect result', () async {
+    final result = await calculate(3);
+
+    expect(result, 42);
+  });
+
+  test('calculation finishes with correct result but much faster', () {
+    int seconds = 365 * 24 * 60 * 60;
+    final result = fakeAsync((fakeAsync) {
+      print('### fake async start: ${clock.now()}');
+      int futureResult;
+      calculate(seconds).then((value) {
+        futureResult = value;
+      });
+      fakeAsync.elapse(Duration(seconds: seconds));
+      print('### fake async stop: ${clock.now()}');
+
+      return futureResult;
+    });
+
+    expect(result, 42);
   });
 }
