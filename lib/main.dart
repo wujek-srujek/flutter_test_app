@@ -48,6 +48,7 @@ class _TabbedPageState extends State<TabbedPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('${DateTime.now()}'),
         bottom: TabBar(
           controller: tabController,
           tabs: tabs,
