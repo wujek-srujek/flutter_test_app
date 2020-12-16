@@ -175,7 +175,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     Stream<UsersEvent> events,
     transitionFn,
   ) {
-    return events.switchMap(transitionFn);
+    return events.flatMap(transitionFn);
   }
 
   @override
