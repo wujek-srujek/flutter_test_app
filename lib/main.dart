@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rxdart/rxdart.dart';
 
 void main() {
   runApp(App());
@@ -37,7 +38,7 @@ class Page extends StatelessWidget {
         children: [
           ElevatedButton(
             onPressed: () {
-              context.read<UsersBloc>().add(UsersRequested(triggerAgain: true));
+              context.read<UsersBloc>().add(UsersRequested());
             },
             child: Text('Load data'),
           ),
@@ -99,9 +100,6 @@ abstract class UsersEvent {}
 
 class UsersRequested extends UsersEvent {
   final tag = 'E${++_eventNumber}';
-  final bool triggerAgain;
-
-  UsersRequested({@required this.triggerAgain});
 
   @override
   String toString() {
@@ -155,10 +153,6 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
 
       final loadedIds = await _idClient.loadIds(count);
 
-      if (event.triggerAgain) {
-        add(UsersRequested(triggerAgain: false));
-      }
-
       final loadedColors = await _colorClient.loadColors(count, event.tag);
 
       if (state is! UsersLoadingInProgress) {
@@ -174,6 +168,14 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
 
       yield UsersLoadingSuccess(event.tag, users);
     }
+  }
+
+  @override
+  Stream<Transition<UsersEvent, UsersState>> transformEvents(
+    Stream<UsersEvent> events,
+    transitionFn,
+  ) {
+    return events.switchMap(transitionFn);
   }
 
   @override
