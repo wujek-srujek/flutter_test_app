@@ -37,7 +37,7 @@ class Page extends StatelessWidget {
         children: [
           ElevatedButton(
             onPressed: () {
-              context.read<UsersBloc>().add(UsersRequested());
+              context.read<UsersBloc>().add(UsersRequested(triggerAgain: true));
             },
             child: Text('Load data'),
           ),
@@ -99,6 +99,9 @@ abstract class UsersEvent {}
 
 class UsersRequested extends UsersEvent {
   final tag = 'E${++_eventNumber}';
+  final bool triggerAgain;
+
+  UsersRequested({@required this.triggerAgain});
 
   @override
   String toString() {
@@ -151,6 +154,10 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       final count = _random.nextInt(5) + 5;
 
       final loadedIds = await _idClient.loadIds(count);
+
+      if (event.triggerAgain) {
+        add(UsersRequested(triggerAgain: false));
+      }
 
       final loadedColors = await _colorClient.loadColors(count, event.tag);
 
