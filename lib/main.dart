@@ -153,7 +153,9 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
 
       final loadedIds = await _idClient.loadIds(count);
 
+      print('### [$t] before loadColors() for event [${event.tag}]');
       final loadedColors = await _colorClient.loadColors(count, event.tag);
+      print('### [$t] after loadColors() for event [${event.tag}]');
 
       if (state is! UsersLoadingInProgress) {
         throw 'Oh noes, inconsistent state for event [$event]!';
@@ -175,7 +177,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     Stream<UsersEvent> events,
     transitionFn,
   ) {
-    return events.flatMap(transitionFn);
+    return events.switchMap(transitionFn);
   }
 
   @override
@@ -208,6 +210,7 @@ class ColorClient {
   final client = HttpClient();
 
   Future<List<Color>> loadColors(int count, String eventTag) async {
+    print('### [$t] loadColors() for event [$eventTag] start');
     final request = await client.getUrl(
       Uri.parse('http://localhost:42666?count=$count&eventTag=$eventTag'),
     );
@@ -215,6 +218,7 @@ class ColorClient {
     // No error handling, please forgive me, that's not the point here.
     final data = (await ascii.decoder.bind(response).join()).trim();
 
+    print('### [$t] loadColors() for event [$eventTag] end');
     return data.split('\n').map((colorLine) {
       final argb = colorLine.split(',').map((part) {
         return int.parse(part);
