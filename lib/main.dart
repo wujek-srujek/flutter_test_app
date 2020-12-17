@@ -156,6 +156,11 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       print('### [$t] before loadColors() for event [${event.tag}]');
       final loadedColors = await _colorClient.loadColors(count, event.tag);
       print('### [$t] after loadColors() for event [${event.tag}]');
+      if (loadedColors == null) {
+        // Request cancelled, nothing to do.
+        print('### [$t] early exit for aborted event [${event.tag}]');
+        return;
+      }
 
       if (state is! UsersLoadingInProgress) {
         throw 'Oh noes, inconsistent state for event [$event]!';
@@ -206,15 +211,26 @@ class IdClient {
   }
 }
 
+class _CancellationSentinel {}
+
 class ColorClient {
   final client = HttpClient();
 
+  HttpClientRequest _currentRequest;
+
   Future<List<Color>> loadColors(int count, String eventTag) async {
     print('### [$t] loadColors() for event [$eventTag] start');
-    final request = await client.getUrl(
+    _currentRequest?.abort(_CancellationSentinel());
+    _currentRequest = await client.getUrl(
       Uri.parse('http://localhost:42666?count=$count&eventTag=$eventTag'),
     );
-    final response = await request.close();
+    HttpClientResponse response;
+    try {
+      response = await _currentRequest.close();
+    } on _CancellationSentinel {
+      print('### [$t] loadColors() for event [$eventTag] aborted');
+      return null;
+    }
     // No error handling, please forgive me, that's not the point here.
     final data = (await ascii.decoder.bind(response).join()).trim();
 
