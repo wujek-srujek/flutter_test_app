@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 void main() {
   runApp(App());
@@ -15,11 +16,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: BlocProvider(
-        create: (context) => UsersBloc(
-          IdClient(),
-          ColorClient(),
-        ),
+      home: Container(
         child: Scaffold(
           appBar: AppBar(),
           body: Page(),
@@ -40,35 +37,6 @@ class Page extends StatelessWidget {
               context.read<UsersBloc>().add(UsersRequested());
             },
             child: Text('Load data'),
-          ),
-          Expanded(
-            child: BlocBuilder<UsersBloc, UsersState>(
-              builder: (context, state) {
-                if (state is UsersLoadingSuccess) {
-                  final users = state.users;
-                  return ListView.builder(
-                    itemCount: users.length,
-                    itemBuilder: (context, index) {
-                      final user = users[index];
-
-                      return ListTile(
-                        leading: Container(
-                          height: 50,
-                          width: 50,
-                          color: user.image,
-                        ),
-                        title: Text(user.id),
-                      );
-                    },
-                  );
-                } else if (state is UsersLoadingInProgress) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return Container();
-              },
-            ),
           ),
         ],
       ),
@@ -171,14 +139,12 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
 
   @override
   void onEvent(UsersEvent event) {
-    super.onEvent(event);
     print('### [$t] added new event [$event], current state [$state]');
   }
 
   @override
-  void onTransition(Transition<UsersEvent, UsersState> transition) {
-    super.onTransition(transition);
-    print('### [$t] yielding new state [${transition.nextState}]');
+  void onTransition(UsersState state, UsersState newState) {
+    print('### [$t] yielding new state [$newState]');
   }
 }
 
@@ -213,4 +179,63 @@ class ColorClient {
       return Color.fromARGB(argb[0], argb[1], argb[2], argb[3]);
     }).toList();
   }
+}
+
+// Poor man's BLoC ==============================
+
+// Bloc
+
+abstract class Bloc<E, S> {
+  final StreamController<E> _streamController = StreamController<E>();
+
+  Stream<S> _states;
+  S _state;
+
+  Bloc(this._state) {
+    final statesStream = transformEvents(
+      _streamController.stream.doOnData(onEvent),
+      mapEventToState,
+    );
+    _states = transformStates(statesStream).distinct().doOnData((newState) {
+      onTransition(_state, newState);
+      _state = newState;
+    });
+  }
+
+  @mustCallSuper
+  Future<void> close() {
+    return _streamController.close();
+  }
+
+  void add(E event) {
+    _streamController.add(event);
+  }
+
+  S get state => _state;
+
+  Stream<S> get states => _states;
+
+  @visibleForOverriding
+  Stream<S> transformEvents(
+    Stream<E> events,
+    Stream<S> Function(E) convert,
+  ) {
+    // By default, events are processed sequentially to completion.
+    return events.asyncExpand(convert);
+  }
+
+  @visibleForOverriding
+  Stream<S> transformStates(Stream<S> statesStream) {
+    // By default, states are not processed.
+    return statesStream;
+  }
+
+  @visibleForOverriding
+  void onEvent(E event) {}
+
+  @visibleForOverriding
+  void onTransition(S state, S newState) {}
+
+  @visibleForOverriding
+  Stream<S> mapEventToState(E event);
 }
