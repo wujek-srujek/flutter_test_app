@@ -128,6 +128,9 @@ abstract class UsersEvent {}
 
 class UsersRequested extends UsersEvent {
   final tag = 'E${++_eventNumber}';
+  final List<String> loadedIds;
+
+  UsersRequested(this.loadedIds);
 
   @override
   String toString() {
@@ -175,8 +178,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     Stream<List<String>> loadedIdsStream,
   ) : super(UsersInitial('<initial>')) {
     _loadedIdsSubscription = loadedIdsStream.listen((loadedIds) {
-      _loadedIds = loadedIds;
-      add(UsersRequested());
+      add(UsersRequested(loadedIds));
     });
   }
 
@@ -191,6 +193,8 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     if (event is UsersRequested) {
       // await Future.delayed(Duration(milliseconds: 100));
       yield UsersLoadingInProgress(event.tag);
+
+      _loadedIds = event.loadedIds;
 
       final count = _loadedIds.length;
 
