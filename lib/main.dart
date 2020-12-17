@@ -140,6 +140,8 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
   final IdClient _idClient;
   final ColorClient _colorClient;
 
+  List<String> _loadedIds;
+
   UsersBloc(this._idClient, this._colorClient)
       : super(UsersInitial('<initial>'));
 
@@ -151,26 +153,20 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
 
       final count = _random.nextInt(5) + 5;
 
-      final loadedIds = await _idClient.loadIds(count);
+      _loadedIds = await _idClient.loadIds(count);
 
-      print('### [$t] before loadColors() for event [${event.tag}]');
       final loadedColors = await _colorClient.loadColors(count, event.tag);
-      print('### [$t] after loadColors() for event [${event.tag}]');
-      if (loadedColors == null) {
-        // Request cancelled, nothing to do.
-        print('### [$t] early exit for aborted event [${event.tag}]');
-        return;
-      }
 
       if (state is! UsersLoadingInProgress) {
         throw 'Oh noes, inconsistent state for event [$event]!';
       }
-      if (loadedIds.length != loadedColors.length) {
+
+      if (_loadedIds.length != loadedColors.length) {
         throw 'Oh noes, inconsistent lengths for event [$event]!';
       }
 
-      final users = List.generate(loadedIds.length, (index) {
-        return User(loadedIds[index], loadedColors[index]);
+      final users = List.generate(_loadedIds.length, (index) {
+        return User(_loadedIds[index], loadedColors[index]);
       });
 
       yield UsersLoadingSuccess(event.tag, users);
@@ -211,30 +207,17 @@ class IdClient {
   }
 }
 
-class _CancellationSentinel {}
-
 class ColorClient {
   final client = HttpClient();
 
-  HttpClientRequest _currentRequest;
-
   Future<List<Color>> loadColors(int count, String eventTag) async {
-    print('### [$t] loadColors() for event [$eventTag] start');
-    _currentRequest?.abort(_CancellationSentinel());
-    _currentRequest = await client.getUrl(
+    final request = await client.getUrl(
       Uri.parse('http://localhost:42666?count=$count&eventTag=$eventTag'),
     );
-    HttpClientResponse response;
-    try {
-      response = await _currentRequest.close();
-    } on _CancellationSentinel {
-      print('### [$t] loadColors() for event [$eventTag] aborted');
-      return null;
-    }
+    final response = await request.close();
     // No error handling, please forgive me, that's not the point here.
     final data = (await ascii.decoder.bind(response).join()).trim();
 
-    print('### [$t] loadColors() for event [$eventTag] end');
     return data.split('\n').map((colorLine) {
       final argb = colorLine.split(',').map((part) {
         return int.parse(part);
