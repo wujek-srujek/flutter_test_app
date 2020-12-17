@@ -6,24 +6,45 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rxdart/rxdart.dart';
 
 void main() {
   runApp(App());
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  StreamController<List<String>> loadedIdsController;
+
+  @override
+  void initState() {
+    super.initState();
+    loadedIdsController = StreamController();
+  }
+
+  @override
+  void dispose() {
+    loadedIdsController.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: BlocProvider(
         create: (context) => UsersBloc(
-          IdClient(),
           ColorClient(),
+          loadedIdsController.stream,
         ),
         child: Scaffold(
           appBar: AppBar(),
-          body: Page(),
+          body: Page(
+            IdClient(),
+            loadedIdsController.sink,
+          ),
         ),
       ),
     );
@@ -31,14 +52,21 @@ class App extends StatelessWidget {
 }
 
 class Page extends StatelessWidget {
+  final Sink<List<String>> loadedIdsSink;
+  final IdClient idClient;
+
+  Page(this.idClient, this.loadedIdsSink);
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
           ElevatedButton(
-            onPressed: () {
-              context.read<UsersBloc>().add(UsersRequested());
+            onPressed: () async {
+              final count = _random.nextInt(5) + 5;
+              final loadedIds = idClient.loadIds(count);
+              loadedIdsSink.add(loadedIds);
             },
             child: Text('Load data'),
           ),
@@ -137,13 +165,26 @@ class UsersLoadingSuccess extends UsersState {
 // BLoC
 
 class UsersBloc extends Bloc<UsersEvent, UsersState> {
-  final IdClient _idClient;
   final ColorClient _colorClient;
 
+  StreamSubscription<List<String>> _loadedIdsSubscription;
   List<String> _loadedIds;
 
-  UsersBloc(this._idClient, this._colorClient)
-      : super(UsersInitial('<initial>'));
+  UsersBloc(
+    this._colorClient,
+    Stream<List<String>> loadedIdsStream,
+  ) : super(UsersInitial('<initial>')) {
+    _loadedIdsSubscription = loadedIdsStream.listen((loadedIds) {
+      _loadedIds = loadedIds;
+      add(UsersRequested());
+    });
+  }
+
+  @override
+  Future<void> close() async {
+    await _loadedIdsSubscription?.cancel();
+    return super.close();
+  }
 
   @override
   Stream<UsersState> mapEventToState(UsersEvent event) async* {
@@ -151,9 +192,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       // await Future.delayed(Duration(milliseconds: 100));
       yield UsersLoadingInProgress(event.tag);
 
-      final count = _random.nextInt(5) + 5;
-
-      _loadedIds = await _idClient.loadIds(count);
+      final count = _loadedIds.length;
 
       final loadedColors = await _colorClient.loadColors(count, event.tag);
 
@@ -174,14 +213,6 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
   }
 
   @override
-  Stream<Transition<UsersEvent, UsersState>> transformEvents(
-    Stream<UsersEvent> events,
-    transitionFn,
-  ) {
-    return events.switchMap(transitionFn);
-  }
-
-  @override
   void onEvent(UsersEvent event) {
     super.onEvent(event);
     print('### [$t] added new event [$event], current state [$state]');
@@ -197,9 +228,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
 // Clients ==============================
 
 class IdClient {
-  Future<List<String>> loadIds(int count) async {
-    await Future.delayed(Duration(milliseconds: 500));
-
+  List<String> loadIds(int count) {
     return List.generate(
       count,
       (_) => '${_random.nextInt(100000) + 100000}',
