@@ -71,12 +71,6 @@ class Page extends StatelessWidget {
               },
             ),
           ),
-          BlocListener<UsersBloc, UsersState>(
-            listener: (state) {
-              print('### [$t] listener fired for state [$state]');
-            },
-            child: Container(),
-          ),
         ],
       ),
     );
@@ -323,22 +317,19 @@ class BlocBuilder<B extends Bloc<dynamic, S>, S> extends StatefulWidget {
 
 class _BlocBuilderState<B extends Bloc<dynamic, S>, S>
     extends State<BlocBuilder<B, S>> {
-  B bloc;
+  S state;
 
   @override
   void initState() {
     super.initState();
-    bloc = context.read<B>();
+    state = context.read<B>().state;
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<S>(
-      initialData: bloc.state,
-      stream: bloc.states,
-      builder: (context, snapshot) {
-        return widget.builder(context, snapshot.data);
-      },
+    return BlocListener<B, S>(
+      listener: (state) => setState(() => this.state = state),
+      child: widget.builder(context, state),
     );
   }
 }
