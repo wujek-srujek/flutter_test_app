@@ -30,28 +30,7 @@ class App extends StatelessWidget {
   }
 }
 
-class Page extends StatefulWidget {
-  @override
-  _PageState createState() => _PageState();
-}
-
-class _PageState extends State<Page> {
-  StreamSubscription<UsersState> subscription;
-
-  @override
-  void initState() {
-    super.initState();
-    subscription = context.read<UsersBloc>().states.listen((state) {
-      print('### [$t] got state $state');
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    subscription?.cancel();
-  }
-
+class Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -62,6 +41,35 @@ class _PageState extends State<Page> {
               context.read<UsersBloc>().add(UsersRequested());
             },
             child: Text('Load data'),
+          ),
+          Expanded(
+            child: BlocBuilder<UsersBloc, UsersState>(
+              builder: (context, state) {
+                if (state is UsersLoadingSuccess) {
+                  final users = state.users;
+                  return ListView.builder(
+                    itemCount: users.length,
+                    itemBuilder: (context, index) {
+                      final user = users[index];
+
+                      return ListTile(
+                        leading: Container(
+                          height: 50,
+                          width: 50,
+                          color: user.image,
+                        ),
+                        title: Text(user.id),
+                      );
+                    },
+                  );
+                } else if (state is UsersLoadingInProgress) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return Container();
+              },
+            ),
           ),
         ],
       ),
@@ -292,6 +300,39 @@ class BlocProvider<B extends Bloc<dynamic, dynamic>> extends StatelessWidget {
         bloc?.close();
       },
       child: child,
+    );
+  }
+}
+
+// BlocBuilder
+
+class BlocBuilder<B extends Bloc<dynamic, S>, S> extends StatefulWidget {
+  final Widget Function(BuildContext, S) builder;
+
+  const BlocBuilder({@required this.builder});
+
+  @override
+  _BlocBuilderState<B, S> createState() => _BlocBuilderState<B, S>();
+}
+
+class _BlocBuilderState<B extends Bloc<dynamic, S>, S>
+    extends State<BlocBuilder<B, S>> {
+  B bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    bloc = context.read<B>();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<S>(
+      initialData: bloc.state,
+      stream: bloc.states,
+      builder: (context, snapshot) {
+        return widget.builder(context, snapshot.data);
+      },
     );
   }
 }
