@@ -30,7 +30,28 @@ class App extends StatelessWidget {
   }
 }
 
-class Page extends StatelessWidget {
+class Page extends StatefulWidget {
+  @override
+  _PageState createState() => _PageState();
+}
+
+class _PageState extends State<Page> {
+  StreamSubscription<UsersState> subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    subscription = context.read<UsersBloc>().states.listen((state) {
+      print('### [$t] got state $state');
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    subscription?.cancel();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
