@@ -71,38 +71,11 @@ class Page extends StatelessWidget {
               },
             ),
           ),
-          Divider(
-            color: Theme.of(context).primaryColor,
-            thickness: 2,
-          ),
-          Expanded(
-            child: BlocBuilder<UsersBloc, UsersState>(
-              builder: (context, state) {
-                if (state is UsersLoadingSuccess) {
-                  final users = state.users;
-                  return ListView.builder(
-                    itemCount: users.length,
-                    itemBuilder: (context, index) {
-                      final user = users[index];
-
-                      return ListTile(
-                        leading: Container(
-                          height: 50,
-                          width: 50,
-                          color: user.image,
-                        ),
-                        title: Text(user.id),
-                      );
-                    },
-                  );
-                } else if (state is UsersLoadingInProgress) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return Container();
-              },
-            ),
+          BlocListener<UsersBloc, UsersState>(
+            listener: (state) {
+              print('### [$t] listener fired for state [$state]');
+            },
+            child: Container(),
           ),
         ],
       ),
@@ -368,4 +341,38 @@ class _BlocBuilderState<B extends Bloc<dynamic, S>, S>
       },
     );
   }
+}
+
+// BlocListener
+
+class BlocListener<B extends Bloc<dynamic, S>, S> extends StatefulWidget {
+  final void Function(S) listener;
+  final Widget child;
+
+  const BlocListener({@required this.listener, @required this.child});
+
+  @override
+  _BlocListenerState<B, S> createState() => _BlocListenerState<B, S>();
+}
+
+class _BlocListenerState<B extends Bloc<dynamic, S>, S>
+    extends State<BlocListener<B, S>> {
+  B bloc;
+  StreamSubscription<S> subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    bloc = context.read<B>();
+    subscription = bloc.states.listen(widget.listener);
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
