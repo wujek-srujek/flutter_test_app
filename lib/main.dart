@@ -16,7 +16,11 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Container(
+      home: BlocProvider(
+        create: (context) => UsersBloc(
+          IdClient(),
+          ColorClient(),
+        ),
         child: Scaffold(
           appBar: AppBar(),
           body: Page(),
@@ -238,4 +242,28 @@ abstract class Bloc<E, S> {
 
   @visibleForOverriding
   Stream<S> mapEventToState(E event);
+}
+
+// BlocProvider
+
+class BlocProvider<B extends Bloc<dynamic, dynamic>> extends StatelessWidget {
+  final B Function(BuildContext context) create;
+  final Widget child;
+
+  const BlocProvider({
+    @required this.create,
+    @required this.child,
+  })  : assert(create != null),
+        assert(child != null);
+
+  @override
+  Widget build(BuildContext context) {
+    return Provider<B>(
+      create: create,
+      dispose: (context, bloc) {
+        bloc?.close();
+      },
+      child: child,
+    );
+  }
 }
