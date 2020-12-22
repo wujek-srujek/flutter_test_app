@@ -253,7 +253,7 @@ class ColorClient {
 
 abstract class Bloc<E, S> {
   final StreamController<E> _events = StreamController<E>();
-  final StreamController<S> _states = StreamController<S>();
+  final StreamController<S> _states = StreamController<S>.broadcast();
 
   StreamSubscription<S> _statesSubscription;
   S _state;
