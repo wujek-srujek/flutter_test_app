@@ -71,6 +71,39 @@ class Page extends StatelessWidget {
               },
             ),
           ),
+          Divider(
+            color: Theme.of(context).primaryColor,
+            thickness: 2,
+          ),
+          Expanded(
+            child: BlocBuilder<UsersBloc, UsersState>(
+              builder: (context, state) {
+                if (state is UsersLoadingSuccess) {
+                  final users = state.users;
+                  return ListView.builder(
+                    itemCount: users.length,
+                    itemBuilder: (context, index) {
+                      final user = users[index];
+
+                      return ListTile(
+                        leading: Container(
+                          height: 50,
+                          width: 50,
+                          color: user.image,
+                        ),
+                        title: Text(user.id),
+                      );
+                    },
+                  );
+                } else if (state is UsersLoadingInProgress) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return Container();
+              },
+            ),
+          ),
         ],
       ),
     );
