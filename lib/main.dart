@@ -190,34 +190,41 @@ class ColorClient {
 // Bloc
 
 abstract class Bloc<E, S> {
-  final StreamController<E> _streamController = StreamController<E>();
+  final StreamController<E> _events = StreamController<E>();
+  final StreamController<S> _states = StreamController<S>();
 
-  Stream<S> _states;
+  StreamSubscription<S> _statesSubscription;
   S _state;
 
   Bloc(this._state) {
     final statesStream = transformEvents(
-      _streamController.stream.doOnData(onEvent),
+      _events.stream.doOnData(onEvent),
       mapEventToState,
     );
-    _states = transformStates(statesStream).distinct().doOnData((newState) {
+    final transformedStatesStream =
+        transformStates(statesStream).distinct().doOnData((newState) {
       onTransition(_state, newState);
+    });
+    _statesSubscription = transformedStatesStream.listen((newState) {
       _state = newState;
+      _states.add(_state);
     });
   }
 
   @mustCallSuper
-  Future<void> close() {
-    return _streamController.close();
+  Future<void> close() async {
+    await _events.close();
+    await _states.close();
+    return _statesSubscription.cancel();
   }
 
   void add(E event) {
-    _streamController.add(event);
+    _events.add(event);
   }
 
   S get state => _state;
 
-  Stream<S> get states => _states;
+  Stream<S> get states => _states.stream;
 
   @visibleForOverriding
   Stream<S> transformEvents(
