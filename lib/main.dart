@@ -171,6 +171,14 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
   }
 
   @override
+  Stream<UsersState> transformEvents(
+    Stream<UsersEvent> events,
+    Stream<UsersState> Function(UsersEvent) convert,
+  ) {
+    return events.switchMap(mapEventToState);
+  }
+
+  @override
   void onEvent(UsersEvent event) {
     print('### [$t] added new event [$event], current state [$state]');
   }
