@@ -7,9 +7,22 @@ void main() {
         body: SafeArea(
           child: _Pager<void>(
             nextRoute: (depth) {
-              return MaterialPageRoute<void>(
-                builder: (context) => _Page(
-                  depth: depth,
+              return _pageRouteBuilder(
+                (_) => Column(
+                  children: [
+                    Expanded(
+                      child: _Page(depth: depth),
+                    ),
+                    Expanded(
+                      child: _Pager<void>(
+                        nextRoute: (depth) {
+                          return _pageRouteBuilder(
+                            (_) => FittedBox(child: Text('$depth')),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -17,6 +30,31 @@ void main() {
         ),
       ),
     ),
+  );
+}
+
+PageRouteBuilder<T> _pageRouteBuilder<T>(WidgetBuilder builder) {
+  return PageRouteBuilder(
+    // transitionDuration: Duration(seconds: 3),
+    // reverseTransitionDuration: Duration(seconds: 3),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return builder(context);
+    },
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: Offset(1, 0),
+          end: Offset.zero,
+        ).animate(animation),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: Offset.zero,
+            end: Offset(-1, 0),
+          ).animate(secondaryAnimation),
+          child: child,
+        ),
+      );
+    },
   );
 }
 
